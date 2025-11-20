@@ -1,49 +1,3 @@
---========================--
--- NeoZ Hub – Anti-PingDrop v1 (TOP PRIORITY)
---========================--
-
-repeat task.wait() until game:IsLoaded()
-
-local RunService   = game:GetService("RunService")
-local Stats        = game:GetService("Stats")
-local Workspace    = game:GetService("Workspace")
-
--- Ultra-light network stabilizer
-task.spawn(function()
-while true do
-task.wait(1.2)
-
--- reduce micro stutters
-RunService.Heartbeat:Wait()
-
--- reduce unneeded physics load    
-pcall(function()    
-    Workspace.InterpolationThrottling = Enum.InterpolationThrottlingMode.Disabled    
-    Workspace.StreamingPauseMode = Enum.StreamingPauseMode.Disabled    
-end)    
-
--- smooth ping reading    
-pcall(function()    
-    if Stats.Network and Stats.Network.ServerStatsItem then    
-        local d = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")    
-        if d then d:GetValueString() end    
-    end    
-end)
-
-end
-
-end)
-
--- Micro GC (never lags)
-task.spawn(function()
-while true do
-task.wait(3)
-pcall(function()
-collectgarbage("step", 20)
-end)
-end
-end)
-
 -- NeoZ Hub – ULTRA-SAFE HUD (MAX PERFORMANCE Continuous Edition) - ULTRA NUKED (vFinal)
 -- 100% ORIGINAL UI (unchanged) + MAX performance optimizations under-the-hood
 -- Notes:
@@ -524,23 +478,23 @@ rainbowAcc = rainbowAcc + dt
 if statAccum >= STATS_INTERVAL then
 statAccum = statAccum - STATS_INTERVAL
 
--- compute fps once
-local fps = last_dt > 0 and math.floor(1/last_dt + 0.5) or 0
-local fpsTag = fps >= 60 and "[Excellent]" or fps >= 45 and "[Good]" or fps >= 30 and "[Medium]" or "[Low]"
-fpsLabel.Text = ("FPS: %d %s"):format(fps, fpsTag)
+-- compute fps once    
+local fps = last_dt > 0 and math.floor(1/last_dt + 0.5) or 0    
+local fpsTag = fps >= 60 and "[Excellent]" or fps >= 45 and "[Good]" or fps >= 30 and "[Medium]" or "[Low]"    
+fpsLabel.Text = ("FPS: %d %s"):format(fps, fpsTag)    
 
--- ping: try-safe but minimal pcall
-local ok, pingStr = pcall(function()
-if Stats.Network and Stats.Network.ServerStatsItem then
-local pingObj = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")
-if pingObj then return pingObj:GetValueString() end
-end
-return nil
-end)
-if ok and type(pingStr) == "string" then
-local ms = tonumber(pingStr:match("%d+")) or 0
-local pingTag = ms <= 130 and "[Excellent]" or ms <= 250 and "[Good]" or ms <= 400 and "[Medium]" or "[Low]"
-pingLabel.Text = ("Ping: %dms %s"):format(ms, pingTag)
+-- ping: try-safe but minimal pcall    
+local ok, pingStr = pcall(function()    
+    if Stats.Network and Stats.Network.ServerStatsItem then    
+        local pingObj = Stats.Network.ServerStatsItem:FindFirstChild("Data Ping")    
+        if pingObj then return pingObj:GetValueString() end    
+    end    
+    return nil    
+end)    
+if ok and type(pingStr) == "string" then    
+    local ms = tonumber(pingStr:match("%d+")) or 0    
+    local pingTag = ms <= 130 and "[Excellent]" or ms <= 250 and "[Good]" or ms <= 400 and "[Medium]" or "[Low]"    
+    pingLabel.Text = ("Ping: %dms %s"):format(ms, pingTag)    
 end
 
 end
@@ -580,20 +534,19 @@ Lighting.EnvironmentDiffuseScale = 0
 Lighting.EnvironmentSpecularScale = 0
 end)
 
--- Remove heavy effects ONLY if they exist (safe)
-for _, eff in ipairs({"Bloom", "DepthOfField", "SunRays", "ColorCorrection", "Blur"}) do
-local e = Lighting:FindFirstChildOfClass(eff)
-if e then
-pcall(function() e.Enabled = false end)
-end
-end
-end
+-- Remove heavy effects ONLY if they exist (safe)  
+        for _, eff in ipairs({"Bloom", "DepthOfField", "SunRays", "ColorCorrection", "Blur"}) do  
+            local e = Lighting:FindFirstChildOfClass(eff)  
+            if e then  
+                pcall(function() e.Enabled = false end)  
+            end  
+        end  
+    end  
 
--- Reduce debris lifetime (lighter)
-pcall(function()
-Debris.MaxItems = 200
-end)
-
+    -- Reduce debris lifetime (lighter)  
+    pcall(function()  
+        Debris.MaxItems = 200  
+    end)  
 end)
 
 end
