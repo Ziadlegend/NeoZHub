@@ -1,6 +1,5 @@
--- NeoZ Hub – ULTRA-SAFE HUD (INSTANT AUTOSAVE + MAX PERFORMANCE)
+-- NeoZ Hub v18.1 – FINAL (No Kuwait Time + Instant Autosave + Max Performance)
 -- 100% ORIGINAL UI + LOADING SCREEN PROOF + NEVER DIES
--- Autosave = INSTANT (on every move/click — like the very first version)
 
 repeat task.wait() until game:IsLoaded()
 
@@ -16,7 +15,7 @@ local Debris = game:GetService("Debris")
 local player = Players.LocalPlayer
 if not player or CoreGui:FindFirstChild("NeoZ Hub") then return end
 
--- ===== Instant file save (no debounce) =====
+-- ===== Instant Save (no debounce) =====
 local SAVE = "NeoZHub_Autosave.json"
 local write = writefile or writetofile or write_file
 local read = readfile or readfromfile or read_file
@@ -28,10 +27,7 @@ local function saveNow()
         local state = {
             Frame = {X = Frame.Position.X.Offset, Y = Frame.Position.Y.Offset},
             Toggle = {X = toggleBtn.Position.X.Offset, Y = toggleBtn.Position.Y.Offset},
-            Buttons = {
-                {X = lockBtn.Position.X.Offset, Y = lockBtn.Position.Y.Offset},
-                {X = themeBtn.Position.X.Offset, Y = themeBtn.Position.Y.Offset}
-            },
+            Buttons = {{X = lockBtn.Position.X.Offset, Y = lockBtn.Position.Y.Offset}, {X = themeBtn.Position.X.Offset, Y = themeBtn.Position.Y.Offset}},
             Theme = themeBtn.Text,
             Locked = locked,
             Visible = hudVisible
@@ -42,10 +38,10 @@ end
 
 local function loadNow()
     if not canSave then return end
-    local success, content = pcall(read, SAVE)
-    if success and content then
-        local success2, data = pcall(Http.JSONDecode, Http, content)
-        if success2 and data then
+    local s, c = pcall(read, SAVE)
+    if s and c then
+        local success, data = pcall(Http.JSONDecode, Http, c)
+        if success and data then
             if data.Frame then Frame.Position = UDim2.new(Frame.Position.X.Scale, data.Frame.X, Frame.Position.Y.Scale, data.Frame.Y) end
             if data.Toggle then toggleBtn.Position = UDim2.new(toggleBtn.Position.X.Scale, data.Toggle.X, toggleBtn.Position.Y.Scale, data.Toggle.Y) end
             if data.Buttons then
@@ -54,12 +50,12 @@ local function loadNow()
             end
             if data.Theme then themeBtn.Text = data.Theme end
             if data.Locked ~= nil then locked = data.Locked; lockBtn.Text = locked and "🔒" or "🔓" end
-            if data.Visible ~= nil then hudVisible = data.Visible; Frame.Visible = hudVisible; for _,b in buttons do b.Visible = hudVisible end; setToggle() end
+            if data.Visible ~= nil then hudVisible = data.Visible; Frame.Visible = hudVisible; for _,b in buttons do b.Visible = hudVisible end; updateToggle() end
         end
     end
 end
 
--- ===== ORIGINAL UI (100% UNCHANGED) =====
+-- ===== ORIGINAL UI (100% UNCHANGED SIZE + AUTO-SCALE) =====
 local gui = Instance.new("ScreenGui", CoreGui)
 gui.Name = "NeoZ Hub"
 gui.ResetOnSpawn = false
@@ -89,8 +85,8 @@ local statsRow = Instance.new("Frame", Frame)
 statsRow.Size = UDim2.new(1,0,0,20)
 statsRow.BackgroundTransparency = 1
 local hLayout = Instance.new("UIListLayout", statsRow)
-hLayout.FillDirection = "Horizontal"
-hLayout.HorizontalAlignment = "Center"
+hLayout.FillDirection = Enum.FillDirection.Horizontal
+hLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 hLayout.Padding = UDim.new(0,5)
 
 local function stat(txt)
@@ -112,7 +108,7 @@ playersL.Text = "Players: " .. #Players:GetPlayers()
 Players.PlayerAdded:Connect(function() playersL.Text = "Players: " .. #Players:GetPlayers() end)
 Players.PlayerRemoving:Connect(function() playersL.Text = "Players: " .. #Players:GetPlayers() end)
 
--- Buttons (exact original)
+-- Buttons (auto-scale emoji size)
 local function btn(emoji, x)
     local b = Instance.new("TextButton", gui)
     b.Size = UDim2.new(0,35,0,35)
@@ -188,7 +184,7 @@ themeBtn.MouseButton1Click:Connect(function()
     saveNow()
 end)
 
--- ===== Instant Save on Every Drag/Release =====
+-- ===== Instant Save on Drag =====
 local dragging = false
 local dragStart, startPos
 
@@ -201,7 +197,7 @@ local function startDrag(obj)
         i.Changed:Connect(function()
             if i.UserInputState == Enum.UserInputState.End then
                 dragging = false
-                saveNow()  -- INSTANT SAVE
+                saveNow()
             end
         end)
     end)
@@ -239,7 +235,7 @@ RunService.Heartbeat:Connect(function(dt)
     end
 
     local fps = last_dt > 0 and math.floor(1/last_dt + 0.5) or 60
-    fpsL.Text = "FPS: " .. fps .. (fps >= 60 and " [God]" or "")
+    fpsL.Text = "FPS: " .. fps
 
     pcall(function()
         local p = Stats.Network.ServerStatsItem["Data Ping"]
@@ -247,7 +243,7 @@ RunService.Heartbeat:Connect(function(dt)
     end)
 end)
 
--- Boosters (24/7)
+-- Boosters
 task.spawn(function()
     while true do
         pcall(function()
@@ -259,10 +255,10 @@ task.spawn(function()
     end
 end)
 
--- Load on start
+-- Load
 task.spawn(function()
     task.wait(1)
     loadNow()
 end)
 
-print("NeoZ Hub – INSTANT AUTOSAVE EDITION Loaded")
+print("NeoZ Hub v18.1 – FINAL (No Kuwait Time) Loaded")
